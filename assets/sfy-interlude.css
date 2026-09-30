@@ -1,0 +1,145 @@
+/* Simplify interlude — scenes that behave like the site's own text beats:
+   one composition in frame, revealed with the noise-sweep / blur / flare look,
+   over the still-moving Stage 4 city. Sits above the WebGL canvas (z 1) and
+   below the HUD (#ui-container z 2, bottom bar z 200). */
+#sfy-interlude{
+  --ink:#141414; --ink-2:rgba(20,20,20,.82); --ink-3:rgba(20,20,20,.62);
+  --head:#233b3b; --teal:rgb(68,97,102); --green:#1a6e48;
+  --card:rgba(255,255,255,.74); --stroke:rgba(0,0,0,.07); --line:rgba(35,59,59,.18);
+  position:fixed; inset:0; z-index:1; pointer-events:none; visibility:hidden;
+  color:var(--ink); font:400 16px/1.5 'Google Sans Flex','Inter',system-ui,sans-serif;
+}
+#sfy-interlude.is-live{visibility:visible}
+#sfy-interlude *{box-sizing:border-box}
+/* fog veil: keeps the city visible but calm enough to read over */
+.sfy-veil{position:absolute; inset:0; opacity:0; transition:opacity .9s ease;
+  /* light, constant veil: the clouds flying behind the scenes must stay visible */
+  background:
+    radial-gradient(ellipse 70% 58% at 50% 50%,rgba(248,251,250,.62) 0%,rgba(246,250,249,.42) 58%,rgba(244,249,247,.14) 100%),
+    linear-gradient(180deg,rgba(248,251,250,.35) 0%,rgba(248,251,250,0) 18%,rgba(248,251,250,0) 82%,rgba(248,251,250,.4) 100%)}
+#sfy-interlude.is-open .sfy-veil{opacity:1}
+
+/* scenes & beat parts */
+.sfy-scene{position:absolute; inset:0; display:grid; place-items:center; padding:13vh 6vw 17vh}
+.sfy-comp{width:min(1120px,100%)}
+.bt{visibility:hidden}
+.c-center{display:flex; flex-direction:column; align-items:center; text-align:center; gap:min(2.6vh,22px)}
+.c-split{display:grid; grid-template-columns:1.05fr .95fr; gap:5vw; align-items:center}
+.c-stack{display:flex; flex-direction:column; gap:min(2.2vh,18px)}
+
+/* type */
+.sfy-label{font:400 12px/1.2 'PP Supply Mono','Supply Sans',monospace; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3)}
+.sfy-h{text-wrap:balance; font-family:'STK Bureau Serif',Georgia,serif; font-weight:400; color:var(--head); letter-spacing:-.01em; line-height:1.02; margin:0}
+.sfy-h--xl{font-size:clamp(38px,min(7.2vw,9.6vh),104px)}
+.sfy-h--l{font-size:clamp(30px,min(5.2vw,7.6vh),76px)}
+.sfy-h--m{font-size:clamp(24px,min(3.6vw,5.4vh),50px)}
+.sfy-s{font-family:'Pinyon Script','Snell Roundhand',cursive; font-weight:400; color:var(--teal); font-size:1.18em; line-height:.8; letter-spacing:0; padding:0 .06em}
+.sfy-p{color:var(--ink-2); max-width:34em; margin:0; font-size:clamp(15px,min(1.6vw,2.2vh),18px)}
+.sfy-flow{font:400 12px/1.2 'PP Supply Mono',monospace; letter-spacing:.1em; color:var(--teal); text-transform:uppercase}
+
+/* cards / chips / buttons (HUD recipe, no backdrop-filter so the reveal filter stays clean) */
+.sfy-card{background:var(--card); border:1px solid var(--stroke); border-radius:22px; box-shadow:0 4px 16px rgba(0,0,0,.07),inset 0 1px 0 rgba(255,255,255,.8)}
+.sfy-chip{display:inline-flex; align-items:center; padding:7px 12px; border-radius:999px; background:rgba(255,255,255,.72); border:1px solid var(--stroke);
+  font:400 11px/1 'PP Supply Mono',monospace; letter-spacing:.06em; color:var(--head); white-space:nowrap}
+.sfy-row{display:flex; flex-wrap:wrap; gap:7px}
+.c-center .sfy-row{justify-content:center}
+.sfy-cta{pointer-events:auto; display:inline-flex; align-items:center; justify-content:center; gap:10px; border:0; cursor:pointer; border-radius:60px;
+  padding:15px 26px; background:rgb(38,36,36); color:#fcfcfc; font:500 15px/1 'Google Sans Flex','Inter',sans-serif;
+  box-shadow:inset 0 1px .5px rgba(255,255,255,.3),inset 0 -1.5px .5px rgba(0,0,0,.3),0 2px 5px rgba(0,0,0,.25); transition:background .2s}
+.sfy-cta:hover{background:#2f2c2c}
+.sfy-cta:focus-visible{outline:2px solid var(--green); outline-offset:3px}
+
+/* profile */
+.sfy-profile{padding:min(2.6vh,22px) 24px; display:flex; flex-direction:column; gap:10px}
+.sfy-profile .cv{font-family:'STK Bureau Serif',serif; font-size:clamp(38px,6vh,58px); line-height:.9; color:var(--head)}
+.sfy-profile .role{font-family:'STK Bureau Serif',serif; font-size:clamp(20px,3vh,26px); color:var(--head)}
+.sfy-profile ul{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; color:var(--ink-2); font-size:14px}
+.sfy-profile li{display:flex; gap:10px; align-items:center} .sfy-profile li::before{content:''; width:6px; height:6px; border-radius:50%; background:var(--teal); flex:none}
+.sfy-note{display:flex; gap:10px; align-items:center; padding:11px 15px; font-size:14px; color:var(--head)}
+.sfy-note::before{content:''; width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 0 4px rgba(26,110,72,.14); flex:none}
+/* jobs */
+.sfy-job{display:flex; justify-content:space-between; align-items:center; gap:14px; padding:15px 20px}
+.sfy-job .t{font-family:'STK Bureau Serif',serif; font-size:clamp(18px,2.6vh,22px); color:var(--head); line-height:1.1}
+.sfy-job .m{font-size:13px; color:var(--ink-3); margin-top:3px}
+.sfy-job .st{font:400 11px/1 'PP Supply Mono',monospace; letter-spacing:.07em; text-transform:uppercase; color:var(--teal); text-align:right; white-space:nowrap}
+.sfy-job .st b{display:block; font:400 26px/1 'Supply Sans',sans-serif; letter-spacing:0; color:var(--green); margin-bottom:4px}
+/* invite */
+.sfy-invite{padding:22px 24px}
+.sfy-invite .big{font-family:'STK Bureau Serif',serif; font-size:clamp(34px,5.4vh,46px); line-height:1; color:var(--head); margin:10px 0 6px}
+.sfy-check{list-style:none; margin:0; padding:15px 20px; display:grid; grid-template-columns:1fr 1fr; gap:10px 16px; font-size:14px; color:var(--head)}
+.sfy-check li{display:flex; gap:9px; align-items:center}
+.sfy-check li::before{content:'\2713'; width:19px; height:19px; border-radius:50%; display:grid; place-items:center; font-size:10px; color:#fff; background:var(--green); flex:none}
+
+/* problem field */
+.sfy-field{position:relative; width:100%; height:min(36vh,340px)}
+.sfy-field svg{position:absolute; inset:0; width:100%; height:100%; overflow:visible}
+.sfy-tangle{fill:none; stroke:var(--line); stroke-width:1.2}
+.sfy-straight{fill:none; stroke:var(--teal); stroke-width:2; stroke-linecap:round}
+.sfy-word{position:absolute; transform:translate(-50%,-50%); font-family:'STK Bureau Serif',serif; font-size:clamp(20px,min(2.6vw,3.8vh),36px); color:var(--head); white-space:nowrap}
+
+/* pipeline */
+.sfy-track{position:relative; height:120px; margin:min(5vh,40px) 44px 0}
+.sfy-track .base,.sfy-track .fill{position:absolute; left:0; right:0; top:62px; height:2px; background:var(--line); border-radius:2px}
+.sfy-track .fill{right:auto; width:calc(var(--p,0)*100%); background:var(--head)}
+.sfy-node{position:absolute; top:54px; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:12px}
+.sfy-node i{width:18px; height:18px; border-radius:50%; background:#fff; border:2px solid var(--line); transition:background .4s,border-color .4s,box-shadow .4s}
+.sfy-node span{font:400 11px/1 'PP Supply Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); transition:color .4s}
+.sfy-node.on i{background:var(--green); border-color:var(--green); box-shadow:0 0 0 6px rgba(26,110,72,.14)} .sfy-node.on span{color:var(--head)}
+.sfy-mover{position:absolute; top:0; padding:9px 15px; white-space:nowrap; font-size:13px; color:var(--head)}
+
+/* modes */
+.sfy-modes{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:min(4vh,32px); text-align:left}
+.sfy-mode{padding:min(3.4vh,30px); display:flex; flex-direction:column; gap:12px; transition:transform .6s cubic-bezier(.22,1,.36,1),opacity .6s cubic-bezier(.22,1,.36,1),box-shadow .6s}
+.sfy-mode.dim{opacity:.5; transform:scale(.96)}
+.sfy-mode.hi{box-shadow:0 18px 50px rgba(35,59,59,.14),inset 0 1px 0 rgba(255,255,255,.8)}
+.sfy-mode .ex{margin-top:6px; padding:11px 14px; border-radius:13px; background:rgba(255,255,255,.75); border:1px solid var(--stroke); font-size:14px; color:var(--head)}
+.sfy-mode .ex em{font-style:normal; display:block; font:400 10px/1.4 'PP Supply Mono',monospace; letter-spacing:.07em; text-transform:uppercase; color:var(--ink-3); margin-bottom:3px}
+
+/* mass hiring route */
+.sfy-route{display:flex; align-items:center; margin-top:4px}
+.sfy-route .st{flex:none; padding:12px 16px}
+.sfy-route .ar{flex:1; height:2px; min-width:24px; background:var(--line); position:relative; overflow:hidden}
+.sfy-route .ar i{position:absolute; inset:0; background:var(--head); transform:scaleX(var(--k,0)); transform-origin:left}
+
+/* results */
+.sfy-stats{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; width:100%; margin-top:min(3vh,26px)}
+.sfy-stat{padding:min(3vh,26px) 22px; text-align:left}
+.sfy-stat b{display:block; font:400 clamp(36px,min(5vw,7vh),68px)/1 'Supply Sans',sans-serif; color:var(--head); letter-spacing:-.02em}
+.sfy-stat span{display:block; margin-top:10px; color:var(--ink-2); font-size:14px}
+.sfy-fine{font-size:12px; color:var(--ink-3)}
+
+/* pricing */
+.sfy-plans{display:grid; grid-template-columns:1fr 1fr; gap:16px; width:100%; margin-top:min(3vh,26px); text-align:left}
+.sfy-plan{padding:min(3.2vh,28px) 26px; display:flex; flex-direction:column; gap:12px}
+.sfy-plan .amt{font:400 clamp(32px,min(4.4vw,6.4vh),58px)/1 'Supply Sans',sans-serif; color:var(--head); letter-spacing:-.02em}
+.sfy-plan .amt small{font:400 13px/1 'PP Supply Mono',monospace; letter-spacing:.06em; color:var(--ink-3); margin-left:8px}
+.sfy-plan .sfy-cta{align-self:flex-start; margin-top:4px}
+
+/* faq */
+.sfy-qa-stage{position:relative; width:100%; height:min(30vh,260px); margin-top:min(3vh,26px)}
+.sfy-qa{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; text-align:center}
+.sfy-qa .q{font-family:'STK Bureau Serif',serif; font-size:clamp(22px,min(3vw,4.4vh),40px); color:var(--head); line-height:1.1; text-wrap:balance}
+.sfy-qa .a{color:var(--ink-2); max-width:40em; font-size:clamp(14px,min(1.5vw,2.1vh),17px)}
+.sfy-qa-count{margin-top:6px}
+
+/* responsive */
+@media (max-width:900px){
+  .c-split{grid-template-columns:1fr; gap:2.2vh}
+  .sfy-modes,.sfy-plans{grid-template-columns:1fr 1fr; gap:10px}
+  .sfy-stats{grid-template-columns:1fr 1fr; gap:10px}
+  .sfy-scene{padding:12vh 5vw 16vh}
+}
+@media (max-width:600px){
+  .sfy-scene{padding:11vh 16px 17vh}
+  .sfy-modes{grid-template-columns:1fr}
+  .sfy-mode .sfy-p{display:none}
+  .sfy-plan{padding:16px}
+  .sfy-plan .sfy-p{display:none}
+  .sfy-plan .sfy-cta{padding:12px 16px; font-size:13px}
+  .sfy-job:nth-child(2){display:none}
+  .sfy-profile ul{display:none}
+  .sfy-check{grid-template-columns:1fr; padding:12px 16px}
+  .sfy-track{margin-left:30px; margin-right:30px}
+  .sfy-route .st{padding:9px 10px; font-size:10px}
+}
+@media (max-height:720px){ .sfy-profile ul,.c-split .sfy-p{display:none} }
