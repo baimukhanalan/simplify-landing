@@ -1,6 +1,6 @@
 /* Simplify — landing → platform handoff.
    Every "Start your campaign" entry point (bottom-bar pill, HUD button, interlude CTAs,
-   waitlist form buttons) leads to the platform's interactive sign-up page with a soft
+   waitlist form buttons) leads to the platform's application form (/apply) with a soft
    mint veil transition. Button placement/animation stays exactly as the site renders it. */
 (function () {
   var APP = (window.SIMPLIFY_APP_URL || 'https://app.wesimplify.works').replace(/\/$/, '');
@@ -9,7 +9,7 @@
 
   function target() {
     var ref = new URLSearchParams(location.search).get('ref');
-    return APP + '/login?mode=signup&from=landing' + (ref ? '&ref=' + encodeURIComponent(ref) : '');
+    return APP + '/apply?from=landing' + (ref ? '&ref=' + encodeURIComponent(ref) : '');
   }
 
   function go() {

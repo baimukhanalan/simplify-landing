@@ -84,10 +84,11 @@
 
     
 
-    <link
-      href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&amp;family=Google+Sans+Code:wght@400;700&amp;family=Google+Sans+Flex:wght@500&amp;family=Inter:wght@400;500;600&amp;family=Newsreader:wght@400;500&amp;display=swap"
-      rel="stylesheet"
-    />
+    <!-- Non-render-blocking: a pending cross-origin stylesheet delays the
+         module script (and so the whole WebGL boot) until Google answers. -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&amp;family=Google+Sans+Code:wght@400;700&amp;family=Google+Sans+Flex:wght@500&amp;family=Inter:wght@400;500;600&amp;family=Newsreader:wght@400;500&amp;display=swap" />
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&amp;family=Google+Sans+Code:wght@400;700&amp;family=Google+Sans+Flex:wght@500&amp;family=Inter:wght@400;500;600&amp;family=Newsreader:wght@400;500&amp;display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&amp;family=Google+Sans+Code:wght@400;700&amp;family=Google+Sans+Flex:wght@500&amp;family=Inter:wght@400;500;600&amp;family=Newsreader:wght@400;500&amp;display=swap" rel="stylesheet" /></noscript>
     <style>
       html,
       body {
@@ -199,9 +200,17 @@
       }
     </style>
     <script src="assets/sfy-interlude.js?v=202609281128"></script>
-    <script src="assets/sfy-app-link.js?v=202609292204"></script>
-    <script type="module" crossorigin src="assets/main-B9-HtP-f.js?v=202609292204"></script>
+    <script src="assets/sfy-app-link.js?v=202611242236"></script>
+    <script type="module" crossorigin src="assets/main-B9-HtP-f.js?v=202611242345"></script>
     <link rel="stylesheet" crossorigin href="assets/main-yeWZtezw.css?v=202609281128">
+    <!-- First-screen assets: fetched in parallel with the 1.2 MB bundle instead
+         of after it (the loader/gate needs exactly these). -->
+    <link rel="preload" as="fetch" crossorigin href="assets/textures/frost.webp" />
+    <link rel="preload" as="fetch" crossorigin href="assets/textures/frost_normal.webp" />
+    <link rel="preload" as="fetch" crossorigin href="assets/models/loader_hand.glb" />
+    <link rel="preload" as="fetch" crossorigin href="assets/textures/matcap-hand.webp" />
+    <link rel="preload" as="fetch" crossorigin href="/vendor/draco/draco_wasm_wrapper.js" />
+    <link rel="preload" as="fetch" crossorigin href="/vendor/draco/draco_decoder.wasm" />
   </head>
   
   <body class="webgl-loader-overlay">
